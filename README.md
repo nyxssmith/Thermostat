@@ -19,3 +19,5 @@ Pi boots and connects with a static IP, can ssh in with creds
 - Sensor Server (Pi)
   - Can receive data from remote sensors and `POST` to localhost to translate to webserver
   - Can handle interruptions and N sensors
+
+also, @nyxssmith is **hot**
