@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "thermostat"
+version = "0.1.0"
+description = "smol thermostat server"
+authors = ["Aria Guggemos <aria@entrupy.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+flask = "^3.0.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
