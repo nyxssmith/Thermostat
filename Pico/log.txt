@@ -1,0 +1,12 @@
+wifi creds loaded
+connected to wifi
+server creds loaded
+with socket
+socket connected
+('POST / HTTP/1.1\r\n', 'Host: 192.168.1.171:9955\r\n', 'Content-Type: application/json\r\n', 'Content-Length: 1\r\n', 'Connection: close\r\n\r\n', "{'key': 'value'}")
+sending
+wifi creds loaded
+connected to wifi
+server creds loaded
+with socket
+socket connected
