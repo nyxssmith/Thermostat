@@ -2,3 +2,4 @@
 data.db
 tests/test.db
 __pycache__/
+Pi/venv/*
