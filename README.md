@@ -29,12 +29,17 @@ also, @nyxssmith is **hot**
 STAIC IP:
 
 ```bash
-sudo vi /boot/firmware/cmdline.txt
-# set:
-console=serial0,115200 console=tty1 root=PARTUUID=6820a991-02 rootfstype=ext4 fsck.repair=yes rootwait cfg80211.ieee80211_regdom=US ip=192.168.1.177::192.168.1.1:255.255.255.0:rpi:wlan0:off
-# for IP 192.168.1.77
-# gateway: 192.168.1.1
-# netmask: 255.255.255.0
+nyxandaria@thermostat:~ $ cat /etc/network/interfaces
+# interfaces(5) file used by ifup(8) and ifdown(8)
+# Include files from /etc/network/interfaces.d:
+source /etc/network/interfaces.d/*
+
+auto wlan0
+iface wlan0 inet static
+    address 192.168.1.177
+    netmask 255.255.255.0
+    gateway 192.168.1.1
+    dns-nameservers 192.168.1.1
 ```
 
 Pi-Setup:
