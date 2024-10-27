@@ -7,3 +7,4 @@ serial_port=ttyACM0
 ampy --port /dev/$serial_port ls
 ampy --port /dev/$serial_port get log.txt
 ampy --port /dev/$serial_port rm log.txt
+ampy --port /dev/$serial_port put log.txt
