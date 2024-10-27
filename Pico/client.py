@@ -10,6 +10,8 @@ import os
 import machine
 import time
 
+
+# TODO move to common lib file
 def blink(t=0.5):
     pin = machine.Pin("LED", machine.Pin.OUT)
     pin.toggle()
@@ -53,50 +55,80 @@ def connect_wifi(ssid,password):
         blink()
     except Exception as e:
         log(e)
+        # crash the pico
+        # TODO report the crash
         raise e
-        
-# wifi details
-ssid= None
-password= None
-with open("network_config.json","r") as f:
-    config = json.load(f)
-    ssid = config["ssid"]
-    password = config["password"]
-log("wifi creds loaded")
-# connect
-connect_wifi(ssid,password)
-log("connected to wifi")
-# Server details
-host= None
-port= None
-route= None
-with open("client_config.json","r") as f:
-    config = json.load(f)
-    host = config["address"]
-    port = config["port"]
-    route = config["route"]
-log("server creds loaded")
 
-# Data to send
-data = json.dumps({"sensor_id": 2, "value": 69.69})
-data_length = len(data)
-# Create a socket connection
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)   #creating socket object
-s.connect((host, port))
-log("socket connected")
-# Create HTTP POST request
-request = f"POST {route} HTTP/1.1\r\nHost:{host}:{port}\r\nContent-Type: application/json\r\nContent-Length: {data_length}\r\nConnection: close\r\n\r\n{data}"
 
-log(request)
-# Send the request
-encoded = request.encode('utf-8')
-s.sendall(request.encode())
 
-# Receive the response
-response = s.recv(4096).decode()
-log("Response from server:")
-log(response)
+def send_temp(temp):
+    # Data to send
+    data = json.dumps({"sensor_id": int(sensor_id), "value": float(temp)})
+    data_length = len(data)
+    # Create a socket connection
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)   #creating socket object
+    s.connect((host, port))
+    log("socket connected")
+    # Create HTTP POST request
+    request = f"POST {route} HTTP/1.1\r\nHost:{host}:{port}\r\nContent-Type: application/json\r\nContent-Length: {data_length}\r\nConnection: close\r\n\r\n{data}"
+    log(request)
+    # Send the request
+    encoded = request.encode('utf-8')
+    s.sendall(request.encode())
 
-s.close()
-# long blink after program exit
-blink(2)
+    # Receive the response
+    response = s.recv(4096).decode()
+    log("Response from server:")
+    log(response)
+
+    s.close()
+    # long blink after program exit
+    blink(2)
+
+def get_temp():
+    return 98
+
+def main():
+    # wifi details
+    ssid= None
+    password= None
+    with open("network_config.json","r") as f:
+        config = json.load(f)
+        ssid = config["ssid"]
+        password = config["password"]
+
+    log("wifi creds loaded")
+    # connect
+    connect_wifi(ssid,password)
+    log("connected to wifi")
+    # Server details
+    global host
+    host= None
+    global port
+    port= None
+    global route
+    route= None
+    global sensor_id
+    sensor_id = None
+    interval = None
+    with open("client_config.json","r") as f:
+        config = json.load(f)
+        host = config["address"]
+        port = config["port"]
+        route = config["route"]
+        sensor_id = config["sensor_id"]
+        interval = config["interval"]
+    log("server details loaded")
+
+    # enter main loop
+    while True:
+        # get temp
+        temp = get_temp()
+        # send temp
+        send_temp(temp)
+        # wait interval
+        time.sleep(interval)
+
+
+# run
+main()

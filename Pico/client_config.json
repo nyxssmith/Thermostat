@@ -1,5 +1,7 @@
 {
   "address": "192.168.1.177",
   "port": 5000,
-  "route": "/data"
+  "route": "/data",
+  "sensor_id": 99,
+  "interval": 1
 }
