@@ -7,9 +7,12 @@ import socket
 import json
 
 # Server details
-host = '127.0.0.1'  # Localhost
-port = 9955  # Port the Flask app is listening on
-
+host= None
+port= None
+with open("client_config.json","r") as f:
+    config = json.load(f)
+    host = config["address"]
+    port = config["port"]
 # Data to send
 data = json.dumps({"key1": "value1", "key2": "value2"})
 data_length = len(data)
