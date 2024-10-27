@@ -56,3 +56,46 @@ Pi-Setup:
 7. `mkdir ~/server && cd server`
 8. `git clone https://github.com/nyxssmith/Thermostat && cd Thermostat`
 9. `pip install -r requirements.txt`
+
+## to auto-load server on boot ##
+
+To Setup the RaspPI to autoload this server on boot:
+
+1. `sudo nano /etc/systemd/system/my_python_server.service`
+2.
+```bash
+[Unit]
+Description=Start Python Server with Virtual Environment
+After=network.target
+
+[Service]
+ExecStart=/home/nyxandaria/server/Thermostat/.venv/bin/python /home/nyxandaria/server/Thermostat/Pi/main.py
+WorkingDirectory=/home/nyxandaria/server/Thermostat/Pi
+Restart=always
+User=nyxandaria
+
+# Logging output
+StandardOutput=append:/var/log/my_python_server.log
+StandardError=append:/var/log/my_python_server.log
+
+[Install]
+WantedBy=multi-user.target
+```
+
+4. setup the logs:
+```bash
+sudo touch /var/log/my_python_server.log
+sudo chown nyxandaria:nyxandaria /var/log/my_python_server.log
+```
+
+
+5. apply changes:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart my_python_server.service
+```
+
+6. check status:
+```bash
+sudo systemctl status my_python_server.service
+```
