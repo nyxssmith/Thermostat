@@ -28,5 +28,11 @@ def test_get_data(setup_db):
     # assert the status code
     assert response.status_code == 200
 
-    # assert the response data
-    assert response.json == [[1, 70.2]]
+    # assert the response data, with a length of each tuple to be 3
+    assert len(response.json) == 1
+    assert len(response.json[0]) == 3
+    assert response.json[0][0] == 1
+    assert response.json[0][1] == 70.2
+    #make sure timestamp is valid
+    assert ':' in response.json[0][2]
+    assert '-' in response.json[0][2]
