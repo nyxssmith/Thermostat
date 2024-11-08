@@ -4,7 +4,7 @@ from flask import Flask
 
 app = Flask(__name__)
 
-from routes import data, configuration, daily_schedule
+from routes import data, configuration, daily_schedule, servo
 
 #always run the setup_database function
 from setupdb import setup_database
@@ -14,6 +14,12 @@ setup_database()
 # use the routes/data.py file
 app.route('/data', methods=['POST'])(data.post_data)
 app.route('/data', methods=['GET'])(data.get_data)
+app.route("/servo_position", methods=["GET"])(servo.get_servo_position)
+app.route("/desired_temperature", methods=["GET","POST"])(servo.desired_temperature)
+app.route("/calibrate", methods=["GET","POST"])(servo.calibrate)
+app.route("/get_servo_config", methods=["GET"])(servo.get_servo_config)
+app.route("/set_servo_config", methods=["POST"])(servo.set_servo_config)
+
 
 # - `POST` configuration data format `{"name":"config1",
 # "minimum_temperature":70.0,"maximum_temperature":80.0,
