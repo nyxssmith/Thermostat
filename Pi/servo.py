@@ -1,5 +1,6 @@
 from gpiozero import Servo,AngularServo
 from time import sleep
+import json
 
 pin_number = 25
 
@@ -27,6 +28,51 @@ servo_degrees_allowed_slop = 3
 default_servo_position = 0
 default_current_temperature = 70
 
+def load_config():
+    with open("config.json", "r") as f:
+        config = json.load(f)
+        global servo_sleep_time, servo_degrees_max_temp, servo_degrees_min_temp, servo_degrees_allowed_slop, default_servo_position
+        servo_sleep_time = config["servo_sleep_time"]
+        servo_degrees_max_temp = config["servo_degrees_max_temp"]
+        servo_degrees_min_temp = config["servo_degrees_min_temp"]
+        servo_degrees_allowed_slop = config["servo_degrees_allowed_slop"]
+        default_servo_position = config["default_servo_position"]
+
+def get_config():
+    print("servo_sleep_time: ", servo_sleep_time)
+    print("servo_degrees_max_temp: ", servo_degrees_max_temp)
+    print("servo_degrees_min_temp: ", servo_degrees_min_temp)
+    print("servo_degrees_allowed_slop: ", servo_degrees_allowed_slop)
+    print("default_servo_position: ", default_servo_position)
+    return {
+        "servo_sleep_time": servo_sleep_time,
+        "servo_degrees_max_temp": servo_degrees_max_temp,
+        "servo_degrees_min_temp": servo_degrees_min_temp,
+        "servo_degrees_allowed_slop": servo_degrees_allowed_slop,
+        "default_servo_position": default_servo_position
+    }
+
+# update the config from partial config
+def update_config(new_partial_config):
+    config = None
+    with open("config.json", "rw") as f:
+        config = json.load(f)
+        # only update the values that are valid
+        if "servo_sleep_time" in new_partial_config:
+            config["servo_sleep_time"] = new_partial_config["servo_sleep_time"]
+        if "servo_degrees_max_temp" in new_partial_config:
+            config["servo_degrees_max_temp"] = new_partial_config["servo_degrees_max_temp"]
+        if "servo_degrees_min_temp" in new_partial_config:
+            config["servo_degrees_min_temp"] = new_partial_config["servo_degrees_min_temp"]
+        if "servo_degrees_allowed_slop" in new_partial_config:
+            config["servo_degrees_allowed_slop"] = new_partial_config["servo_degrees_allowed_slop"]
+        if "default_servo_position" in new_partial_config:
+            config["default_servo_position"] = new_partial_config["default_servo_position"]
+        
+        json.dump(config, f)
+    # update global variables
+    load_config()
+
 # servo position 
 def get_servo_position():
     with open(position_file, "r") as f:
@@ -51,6 +97,12 @@ def change_servo_position(up=True):
         sleep(servo_sleep_time)
     save_servo_position()
 
+def get_desired_position():
+    if get_current_temperature() < get_desired_temperature():
+        return servo_degrees_max_temp
+    else:
+        return servo_degrees_min_temp
+
 def get_current_temperature():
     with open(current_temperature_file, "r") as f:
         return float(f.read())
@@ -66,12 +118,22 @@ def servo_position_close_enough(desired_position):
 # if current < desired, set to max if not yet at max position
 # if current > desired, set to min if not yet at min position
 def set_servo_to_desired_position():
+    # reload config in case it was updated by a post request
+    load_config()
     if get_current_temperature() < get_desired_temperature():
         if not servo_position_close_enough(servo_degrees_max_temp):
             change_servo_position(up=True)
     else:
         if not servo_position_close_enough(servo_degrees_min_temp):
             change_servo_position(up=False)
+
+
+# startup
+# TODO more here
+def startup():
+    load_config()
+    set_servo_position(default_servo_position)
+    
 
 # calibration function to set the servo degrees to temp values
 # if /calibrate is called via post "start" it will enter calibration mode
