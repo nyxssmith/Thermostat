@@ -1,11 +1,5 @@
 
 # pytest for Flask app POST /data
-
-
-import pytest
-import requests
-import json
-
 # run the Flask app
 from main import app
 

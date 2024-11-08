@@ -1,71 +1,36 @@
 # basic Flask API app with SQLite3 database
 
-from flask import Flask, request, jsonify
-import sqlite3
+from flask import Flask
 
 app = Flask(__name__)
 
-# - `POST` data format `{"sensor_id":1,"value":70.2}`
-
-# get the tests/test.db if the environment is testing
-import os
-
-def get_db_connection():
-    if 'TESTING' in os.environ:
-        conn = sqlite3.connect('tests/test.db')
-    else:
-        conn = sqlite3.connect('data.db')
-    return conn
+from routes import data, configuration, daily_schedule
 
 #always run the setup_database function
 from setupdb import setup_database
 setup_database()
 
-@app.route('/data', methods=['POST'])
-def post_data():
-    """
-    Handles POST requests to the /data endpoint.
+# - `POST` data format `{"sensor_id":1,"value":70.2}`
+# use the routes/data.py file
+app.route('/data', methods=['POST'])(data.post_data)
+app.route('/data', methods=['GET'])(data.get_data)
 
-    This function retrieves JSON data from the request, inserts it into the database,
-    and returns a success message.
+# - `POST` configuration data format `{"name":"config1",
+# "minimum_temperature":70.0,"maximum_temperature":80.0,
+# "target_temperature":75.0,"default_sensor_id":1,
+# "datetime_range_start":"2021-01-01 00:00:00",
+# "datetime_range_end":"2021-12-31 23:59:59",
+# "overrides_daily_schedule_bool":false}`
+app.route('/configuration', methods=['POST'])(configuration.post_configuration)
+app.route('/configuration/<int:configuration_id>', methods=['GET'])(configuration.get_configuration)
 
-    Returns:
-        Response: A JSON response with a success message and HTTP status code 201.
-    """
-    data = request.get_json()
-    conn = get_db_connection()
-    cur = conn.cursor()
-
-    #validate `sensor_id` and `value` keys, and their types
-    if 'sensor_id' not in data or 'value' not in data:
-        return jsonify({'message': 'Invalid JSON: missing keys `sensor_id` and/or `value`'}), 400
-
-    if not isinstance(data['sensor_id'], int) or not isinstance(data['value'], float):
-        return jsonify({'message': 'Invalid JSON types: `sensor_id` must be an integer and `value` must be a float'}), 400
-
-    cur.execute('INSERT INTO data (sensor_id, value) VALUES (?, ?)', (data['sensor_id'], data['value']))
-    conn.commit()
-    conn.close()
-    return jsonify({'message': 'Data posted successfully'}), 201
-
-@app.route('/data', methods=['GET'])
-def get_data():
-    """
-    Handles GET requests to the /data endpoint.
-
-    This function retrieves all data from the database and returns it as a JSON response.
-
-    Returns:
-        Response: A JSON response with all data from the database and HTTP status code 200.
-    """
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM data')
-    data = cur.fetchall()
-    conn.close()
-    return jsonify(data), 200
-
+# - `POST` daily_schedule data format `{"configuration_id":1,
+# "hour_start":0,"hour_end":6,
+# "minimum_temperature":70.0,"maximum_temperature":80.0,
+# "target_temperature":75.0,"sensor_id":1}`
+app.route('/daily_schedule', methods=['POST'])(daily_schedule.post_daily_schedule)
+app.route('/daily_schedule', methods=['GET'])(daily_schedule.get_daily_schedule)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0') # pragma: no cover
 
