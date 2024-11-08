@@ -1,5 +1,5 @@
 from flask import request, jsonify
-import servo_control
+import .servo_control
 
 # calibration step
 # 0 == not active
