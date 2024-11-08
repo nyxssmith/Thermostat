@@ -1,5 +1,5 @@
 from flask import request, jsonify
-import Pi.routes.servo_control as servo_control
+import servo_control
 
 # calibration step
 # 0 == not active
