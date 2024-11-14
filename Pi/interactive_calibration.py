@@ -13,7 +13,7 @@
 #           calibration is complete
 
 import requests
-server_ip = "192.168.1.177"
+server_ip = "192.168.1.177:5000"
 server_ip = "127.0.0.1:5000"
 def main():
     # check if calibration is active
@@ -30,7 +30,8 @@ def main():
     # prompt user to manually move to 60 degrees on the dial
     print("Please manually move the dial to 60 degrees")
     input("Press enter when ready")
-
+    # TODO need to check if real servo needs to reset its self.angle to 0 here
+    
     # start calibration
     response = requests.post(f"http://{server_ip}/calibrate", json={"command": "start"})
     print(response.json()["message"])
@@ -43,7 +44,10 @@ def main():
             response = requests.post(f"http://{server_ip}/calibrate", json={"command": "at 80"})
             print(response.json()["message"])
             break
-
+        else:
+            response = requests.post(f"http://{server_ip}/calibrate", json={"command": "next"})
+            print(response.json()["message"])
+            
     while True:
         # prompt user if dial is at 50 yet
         user_input = input("Is the dial at 50 degrees? [y/N]: ")
@@ -51,7 +55,10 @@ def main():
             response = requests.post(f"http://{server_ip}/calibrate", json={"command": "at 50"})
             print(response.json()["message"])
             break
-
+        else:
+            response = requests.post(f"http://{server_ip}/calibrate", json={"command": "next"})
+            print(response.json()["message"])
+            
     print("Calibration complete")
 
 main()

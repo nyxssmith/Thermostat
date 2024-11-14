@@ -25,7 +25,8 @@
             "python": "${workspaceFolder}/Pi/venv/bin/python3.11",
             "args": [
                 "--no-debugger",
-                "--no-reload"
+                "--no-reload",
+                "--host 0.0.0.0"
             ],
         },
         {

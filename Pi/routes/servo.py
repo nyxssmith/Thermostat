@@ -8,12 +8,15 @@ import servo_control
 calibration_step = 0
 
 def get_servo_position():
+    # servo positions are the internal degrees counts of the servo
+    # during calibration, 60 degrees on the temp dial is set to 0 servo degrees
+    # then 80F on dial is set to N servo degrees and 50F on dial is set to M servo degrees
     response = {"current_position": servo_control.get_servo_position(),"desired_position":servo_control.get_desired_position()}
     return jsonify(response)
 
 def desired_temperature():
     # TODO: Implement this function for post and get
-    response = {"message": "Data received to get servo position"}
+    response = {"message": "todo"}
     return jsonify(response)
 
 # calibration function to set the servo degrees to temp values
@@ -71,7 +74,7 @@ def calibrate():
         # called to save servo position for 80 degrees
         if calibration_step == 1:
             # save servo position for 80 degrees
-            # TODO ^
+            servo_control.update_config({"servo_degrees_max_temp":servo_control.get_servo_position()})
             calibration_step = 2
             servo_control.set_calibration_step(calibration_step)
             return jsonify({"message": "Saved servo position for 80 degrees"})
@@ -81,7 +84,7 @@ def calibrate():
         # called to save servo position for 50 degrees
         if calibration_step == 2:
             # save servo position for 50 degrees
-            # TODO ^
+            servo_control.update_config({"servo_degrees_min_temp":servo_control.get_servo_position()})
             calibration_step = 0
             servo_control.set_calibration_step(calibration_step)
             return jsonify({"message": "Saved servo position for 50 degrees, calibration complete"})

@@ -5,10 +5,11 @@ import os
 class MockServo:
     def __init__(self, pin_number):
         self.angle = 0
+    # mock change angles
     def max(self):
-        self.angle = 90
+        self.angle += 10
     def min(self):
-        self.angle = -90
+        self.angle -= 10
 
 pin_number = 25
 
@@ -29,11 +30,16 @@ calibration_step_file = "calibration_step.txt"
 current_temperature_file = "current_temperature.txt"
 desired_temperature_file = "desired_temperature.txt"
 
+# TODO maybe this
+"""
 def touch(fname):
     if os.path.exists(fname):
         os.utime(fname, None)
     else:
-        open(fname, 'a').write(0).close()
+        with open(fname, 'a')as f:
+            f.write("0")
+            f.close()
+
 def ensure_files():
     if not os.path.exists(os.path.join(os.getcwd(),config_file)):
         touch(config_file)
@@ -45,10 +51,10 @@ def ensure_files():
         touch(current_temperature_file)
     if not os.path.exists(os.path.join(os.getcwd(),desired_temperature_file)):
         touch(desired_temperature_file)
-ensure_files()
+#ensure_files()
+"""
 
 # servo parameters
-# TODO load from json that can be posted to to update
 # run the min or max cmd for this amount of time, then save the position
 servo_sleep_time = 0.01
 # degrees for when the servo has set the dial to max and min temp
@@ -56,10 +62,12 @@ servo_degrees_max_temp = 90
 servo_degrees_min_temp = -90
 # how much slop to allow when checking if the servo is at the desired position
 servo_degrees_allowed_slop = 3
+# THESE WILL ALL BE SET BY CONFIG FILE ^
+
 
 # calibration settings
 default_servo_position = 0
-default_current_temperature = 70
+default_current_temperature = 60
 
 
 def get_calibration_step():
@@ -97,7 +105,7 @@ def get_config():
 # update the config from partial config
 def update_config(new_partial_config):
     config = None
-    with open(config_file, "rw") as f:
+    with open(config_file, "r") as f:
         config = json.load(f)
         # only update the values that are valid
         if "servo_sleep_time" in new_partial_config:
@@ -110,7 +118,8 @@ def update_config(new_partial_config):
             config["servo_degrees_allowed_slop"] = new_partial_config["servo_degrees_allowed_slop"]
         if "default_servo_position" in new_partial_config:
             config["default_servo_position"] = new_partial_config["default_servo_position"]
-        
+    # save edits
+    with open(config_file, "w") as f:
         json.dump(config, f)
     # update global variables
     load_config()
@@ -125,7 +134,7 @@ def set_servo_position(position):
     servo.angle = position
     
 def save_servo_position():
-    print(servo.angle)
+    print(f"servo angle now {servo.angle}")
     with open(position_file, "w") as f:
         f.write(str(servo.angle))
 
@@ -175,7 +184,8 @@ def set_servo_to_desired_position():
 def startup():
     load_config()
     set_servo_position(default_servo_position)
-    
+
+startup()  
 
 # calibration function to set the servo degrees to temp values
 # if /calibrate is called via post "start" it will enter calibration mode
