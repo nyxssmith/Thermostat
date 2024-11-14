@@ -1,18 +1,51 @@
-from gpiozero import Servo,AngularServo
 from time import sleep
 import json
+import os
+
+class MockServo:
+    def __init__(self, pin_number):
+        self.angle = 0
+    def max(self):
+        self.angle = 90
+    def min(self):
+        self.angle = -90
 
 pin_number = 25
 
-servo = AngularServo(pin_number, min_angle=-90, max_angle=90)
-servo.angle = 0
-servo.max()
+# only run this if on Pi
+try:
+    from gpiozero import Servo,AngularServo
+    servo = AngularServo(pin_number, min_angle=-90, max_angle=90)
+    servo.angle = 0
+    servo.max()
+except:
+    servo=MockServo(pin_number)
 sleep(0.1)
 
 # track current status between boots
+config_file = "config.json"
 position_file = "servo_position.txt"
+calibration_step_file = "calibration_step.txt"
 current_temperature_file = "current_temperature.txt"
 desired_temperature_file = "desired_temperature.txt"
+
+def touch(fname):
+    if os.path.exists(fname):
+        os.utime(fname, None)
+    else:
+        open(fname, 'a').write(0).close()
+def ensure_files():
+    if not os.path.exists(os.path.join(os.getcwd(),config_file)):
+        touch(config_file)
+    if not os.path.exists(os.path.join(os.getcwd(),position_file)):
+        touch(position_file)
+    if not os.path.exists(os.path.join(os.getcwd(),calibration_step_file)):
+        touch(calibration_step_file)
+    if not os.path.exists(os.path.join(os.getcwd(),current_temperature_file)):
+        touch(current_temperature_file)
+    if not os.path.exists(os.path.join(os.getcwd(),desired_temperature_file)):
+        touch(desired_temperature_file)
+ensure_files()
 
 # servo parameters
 # TODO load from json that can be posted to to update
@@ -28,8 +61,17 @@ servo_degrees_allowed_slop = 3
 default_servo_position = 0
 default_current_temperature = 70
 
+
+def get_calibration_step():
+    with open(calibration_step_file, "r") as f:
+        return int(f.read())
+
+def set_calibration_step(step):
+    with open(calibration_step_file, "w") as f:
+        f.write(str(step))
+
 def load_config():
-    with open("config.json", "r") as f:
+    with open(config_file, "r") as f:
         config = json.load(f)
         global servo_sleep_time, servo_degrees_max_temp, servo_degrees_min_temp, servo_degrees_allowed_slop, default_servo_position
         servo_sleep_time = config["servo_sleep_time"]
@@ -55,7 +97,7 @@ def get_config():
 # update the config from partial config
 def update_config(new_partial_config):
     config = None
-    with open("config.json", "rw") as f:
+    with open(config_file, "rw") as f:
         config = json.load(f)
         # only update the values that are valid
         if "servo_sleep_time" in new_partial_config:

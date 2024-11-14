@@ -1,6 +1,5 @@
 
 from flask import request, jsonify
-from main import app
 from setupdb import get_db_connection
 
 def post_data():

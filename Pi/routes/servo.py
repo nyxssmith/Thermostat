@@ -27,9 +27,13 @@ def desired_temperature():
 # then move servo down until post request contains value of "at 50"
 # save the values that the servo is at for 80 and 50 to min and max temp config file
 def calibrate():
+    # file will contain calibration step
+    calibration_step = servo_control.get_calibration_step()
+    print(f"calibration step: {calibration_step}")
+
     # if doing get either tell the user that calibration is active or the current step to do
     if request.method == "GET":
-        if calibration_active:
+        if calibration_step:
             return jsonify({"message": "Calibration is active"})
         else:
             return jsonify({"message": "Calibration is not active"})
@@ -42,11 +46,47 @@ def calibrate():
         return jsonify({"message": "No command received"})
     # command processing
     if data["command"] == "start":
-        calibration_active = 1
+        # start calibration
+        calibration_step = 1
+        servo_control.set_calibration_step(calibration_step)
         return jsonify({"message": "Calibration started"})
     elif data["command"] == "cancel":
-        calibration_active = 0
-        return jsonify({"message": "Calibration cancelled"})    
+        # turn off calibration
+        calibration_step = 0
+        servo_control.set_calibration_step(calibration_step)
+        return jsonify({"message": "Calibration cancelled"})
+    elif data["command"] == "next":
+        # called to move servo to next step during calibration 
+        if calibration_step == 1:
+            # move up from 60
+            servo_control.change_servo_position(True)
+            return jsonify({"message": f"servo moved for {servo_control.servo_sleep_time}s up"})
+        elif calibration_step == 2:
+            # move down to 60
+            servo_control.change_servo_position(False)
+            return jsonify({"message": f"servo moved for {servo_control.servo_sleep_time}s down"})    
+        else:
+            return jsonify({"message": "Not right time for \"next\" command"})
+    elif data["command"] == "at 80":
+        # called to save servo position for 80 degrees
+        if calibration_step == 1:
+            # save servo position for 80 degrees
+            # TODO ^
+            calibration_step = 2
+            servo_control.set_calibration_step(calibration_step)
+            return jsonify({"message": "Saved servo position for 80 degrees"})
+        else:
+            return jsonify({"message": "Not right time for \"at 80\" command"})
+    elif data["command"] == "at 50":
+        # called to save servo position for 50 degrees
+        if calibration_step == 2:
+            # save servo position for 50 degrees
+            # TODO ^
+            calibration_step = 0
+            servo_control.set_calibration_step(calibration_step)
+            return jsonify({"message": "Saved servo position for 50 degrees, calibration complete"})
+        else:
+            return jsonify({"message": "Not right time for \"at 80\" command"})
 
 def get_servo_config():
     response = servo_control.get_config()

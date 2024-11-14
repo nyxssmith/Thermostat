@@ -1,7 +1,6 @@
 
 # routes to POST and GET daily_schedule data
 from flask import request, jsonify
-from main import app
 from setupdb import get_db_connection
 
 # create the daily_schedule table

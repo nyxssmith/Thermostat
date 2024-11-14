@@ -38,5 +38,6 @@ app.route('/daily_schedule', methods=['POST'])(daily_schedule.post_daily_schedul
 app.route('/daily_schedule', methods=['GET'])(daily_schedule.get_daily_schedule)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0') # pragma: no cover
+    #app.run(debug=True, host='0.0.0.0') # pragma: no cover
+    app.run(debug=False, host='0.0.0.0') # pragma: no cover
 

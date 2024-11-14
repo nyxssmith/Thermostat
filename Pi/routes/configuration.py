@@ -1,6 +1,5 @@
 
 from flask import request, jsonify
-from main import app
 from setupdb import get_db_connection
 
 # post route to write configuration data to the database
