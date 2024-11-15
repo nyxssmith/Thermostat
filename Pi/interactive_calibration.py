@@ -31,7 +31,7 @@ def main():
     print("Please manually move the dial to 60 degrees")
     input("Press enter when ready")
     # TODO need to check if real servo needs to reset its self.angle to 0 here
-    
+
     # start calibration
     response = requests.post(f"http://{server_ip}/calibrate", json={"command": "start"})
     print(response.json()["message"])

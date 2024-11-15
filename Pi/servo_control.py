@@ -5,11 +5,14 @@ import os
 class MockServo:
     def __init__(self, pin_number):
         self.angle = 0
+        self.value = None
     # mock change angles
     def max(self):
         self.angle += 10
+        print("servo max")
     def min(self):
         self.angle -= 10
+        print("servo min")
 
 pin_number = 25
 
@@ -19,6 +22,10 @@ try:
     servo = AngularServo(pin_number, min_angle=-90, max_angle=90)
     servo.angle = 0
     servo.max()
+
+    # /home/nyxandaria/server/Thermostat/.venv/lib/python3.11/site-packages/gpiozero/devices.py:300: PinFactoryFallback: Falling back from lgpio: No module named 'lgpio'
+    # warnings.warn(
+    # /home/nyxandaria/server/Thermostat/.venv/lib/python3.11/site-packages/gpiozero/output_devices.py:1509: PWMSoftwareFallback: To reduce servo jitter, use the pigpio pin factory.See https://gpiozero.readthedocs.io/en/stable/api_output.html#servo for more info
 except:
     servo=MockServo(pin_number)
 sleep(0.1)
@@ -140,6 +147,8 @@ def save_servo_position():
 
 # move position up or down and save angle
 def change_servo_position(up=True):
+    # try servo.value
+
     if up:
         servo.max()
         sleep(servo_sleep_time)
@@ -183,7 +192,8 @@ def set_servo_to_desired_position():
 # TODO more here
 def startup():
     load_config()
-    set_servo_position(default_servo_position)
+    servo.value = None
+    #set_servo_position(default_servo_position)
 
 startup()  
 
