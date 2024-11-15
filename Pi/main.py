@@ -14,11 +14,19 @@ setup_database()
 # use the routes/data.py file
 app.route('/data', methods=['POST'])(data.post_data)
 app.route('/data', methods=['GET'])(data.get_data)
+# servo control routes
+# - `GET` returns the current servo position
+# - `POST` data format `{"command":"max"}` or `{"command":"min"}` to move the servo to the max or min position
 app.route("/servo", methods=["GET","POST"])(servo.servo_position)
+# - `GET` returns the desired/current temperature
+# - `POST` data format `{"temperature":70.0}` to set the desired/current temperature
 app.route("/desired_temperature", methods=["GET","POST"])(servo.desired_temperature)
-app.route("/calibrate", methods=["GET","POST"])(servo.calibrate)
-app.route("/get_servo_config", methods=["GET"])(servo.get_servo_config)
-app.route("/set_servo_config", methods=["POST"])(servo.set_servo_config)
+app.route("/current_temperature", methods=["GET","POST"])(servo.current_temperature)
+# - `GET` returns the current configuration
+# TODO more config as needed, rn is just time
+# takes data "servo_move_time":0.01 
+# - POST data format `{"servo_move_time":0.01}`
+app.route("/servo_config", methods=["GET","POST"])(servo.servo_config)
 
 
 # - `POST` configuration data format `{"name":"config1",
@@ -39,5 +47,5 @@ app.route('/daily_schedule', methods=['GET'])(daily_schedule.get_daily_schedule)
 
 if __name__ == '__main__':
     #app.run(debug=True, host='0.0.0.0') # pragma: no cover
-    app.run(debug=False, host='0.0.0.0') # pragma: no cover
+    app.run(debug=False, host='0.0.0.0',port=9988) # pragma: no cover
 

@@ -1,1 +1,1 @@
-{"servo_sleep_time": 0.01, "servo_degrees_max_temp": 30, "servo_degrees_min_temp": -10, "servo_degrees_allowed_slop": 3, "default_servo_position": 0}
+{"servo_move_time": 0.03}
