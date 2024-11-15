@@ -13,19 +13,26 @@ def servo_position():
         # during calibration, 60 degrees on the temp dial is set to 0 servo degrees
         # then 80F on dial is set to N servo degrees and 50F on dial is set to M servo degrees
         # also return the servo modules value
-        response = {"current_position": servo_control.get_servo_position(),"current_value": servo_control.get_servo_value(),"desired_position":servo_control.get_desired_position()}
+        response = {"current_position": servo_control.get_servo_position(),"current_value": servo_control.get_servo_value(),"current_angle":servo_control.get_servo_angle(),"desired_position":servo_control.get_desired_position()}
     else:
         # assume post
         data = request.get_json()
         # get the "value" from the post request
         if "value" in data:
             # set the servo value
-            # in a comment put the curl command to send "value":50 to the servo endpoint
-            # curl -X POST -H "Content-Type: application/json" -d '{"value":50}' http://
+            # in a comment put the curl command to send "value":0.1 to the servo endpoint
+            # curl -X POST -H "Content-Type: application/json" -d '{"value":0.1}' http://
             servo_control.set_servo_value(data["value"])
             response = {"message": f"Servo value set to {data['value']}"}
+        elif "angle" in data:
+            # set the servo angle
+            # in a comment put the curl command to send "angle":50 to the servo endpoint
+            # curl -X POST -H "Content-Type: application/json" -d '{"angle":50}' http://
+            servo_control.set_servo_angle(data["angle"])
+            response = {"message": f"Servo angle set to {data['angle']}"}
         else:
             response = {"message": "No value received"}
+        
     return jsonify(response)
 
 def desired_temperature():

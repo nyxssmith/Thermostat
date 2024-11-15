@@ -19,9 +19,10 @@ pin_number = 25
 # only run this if on Pi
 try:
     from gpiozero import Servo,AngularServo
-    servo = AngularServo(pin_number, min_angle=-90, max_angle=90)
+    servo = AngularServo(pin_number, min_angle=-90, max_angle=90,initial_angle=None)
+    #servo = Servo(pin=pin_number,initial_value=None) # dont control it
     servo.angle = 0
-    servo.max()
+    #servo.max()
 
     # /home/nyxandaria/server/Thermostat/.venv/lib/python3.11/site-packages/gpiozero/devices.py:300: PinFactoryFallback: Falling back from lgpio: No module named 'lgpio'
     # warnings.warn(
@@ -133,15 +134,27 @@ def update_config(new_partial_config):
 
 # servo position 
 def get_servo_position():
+    # position as counted by us
     with open(position_file, "r") as f:
         return int(f.read())
 
+def get_servo_angle():
+    # angle as counted by the servo
+    return servo.angle
+
+# servo values direct to module
 def get_servo_value():
+    # value from -1 to 1 for min and max as counted by the servo
     return servo.value
 
 def set_servo_value(value):
+    # set value
     servo.value = value
 
+def set_servo_angle(angle):
+    # set angle
+    servo.angle = angle
+    
 # update servo class with the saved position from last run
 def set_servo_position(position):
     servo.angle = position
@@ -198,6 +211,7 @@ def set_servo_to_desired_position():
 # TODO more here
 def startup():
     load_config()
+    # set initial value to current
     servo.value = None
     #set_servo_position(default_servo_position)
 
