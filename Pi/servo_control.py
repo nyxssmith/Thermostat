@@ -136,6 +136,12 @@ def get_servo_position():
     with open(position_file, "r") as f:
         return int(f.read())
 
+def get_servo_value():
+    return servo.value
+
+def set_servo_value(value):
+    servo.value = value
+
 # update servo class with the saved position from last run
 def set_servo_position(position):
     servo.angle = position

@@ -14,7 +14,7 @@ setup_database()
 # use the routes/data.py file
 app.route('/data', methods=['POST'])(data.post_data)
 app.route('/data', methods=['GET'])(data.get_data)
-app.route("/servo_position", methods=["GET"])(servo.get_servo_position)
+app.route("/servo", methods=["GET","POST"])(servo.servo_position)
 app.route("/desired_temperature", methods=["GET","POST"])(servo.desired_temperature)
 app.route("/calibrate", methods=["GET","POST"])(servo.calibrate)
 app.route("/get_servo_config", methods=["GET"])(servo.get_servo_config)
