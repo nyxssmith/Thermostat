@@ -22,6 +22,8 @@ app.route("/servo", methods=["GET","POST"])(servo.servo_position)
 # - `POST` data format `{"temperature":70.0}` to set the desired/current temperature
 app.route("/desired_temperature", methods=["GET","POST"])(servo.desired_temperature)
 app.route("/current_temperature", methods=["GET","POST"])(servo.current_temperature)
+# TODO merge current temp into the /data route
+# TODO merge desired temp into the /schedule route
 # - `GET` returns the current configuration
 # TODO more config as needed, rn is just time
 # takes data "servo_move_time":0.01 
