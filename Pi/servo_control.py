@@ -108,14 +108,17 @@ def save_servo_position(pos):
 
 # move position up or down and save angle
 def change_servo_position(up=True):
+    if {True:"max",False:"min"}[up] == get_servo_position():
+        print("already at target position")
+        return {"current_position":get_servo_position()}
     # set value to pos or negative
     # set value to None to stop control
     if up:
-        servo.value = 1
+        servo.value = -1
         sleep(servo_move_time)
         servo.value = None
     else:
-        servo.value = -1
+        servo.value = 1
         sleep(servo_move_time)
         servo.value = None
     
