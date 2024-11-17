@@ -6,12 +6,11 @@ from setupdb import setup_database
 import os
 os.environ['TESTING'] = 'True'
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def setup_db():
     setup_database('tests/test.db')
 
     yield
 
-    # after all tests, delete the test database
-    import os
+    # after each test, delete the test database
     os.remove('tests/test.db')

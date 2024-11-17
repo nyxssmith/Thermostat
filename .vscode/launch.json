@@ -13,6 +13,38 @@
             "console": "integratedTerminal",
             "justMyCode": false,
             "python": "${workspaceFolder}/Pi/venv/bin/python3.11"
+        },
+        {
+            "name": "Server",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/Pi/main.py",
+            "cwd": "${fileDirname}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "python": "${workspaceFolder}/Pi/venv/bin/python3.11",
+            "args": [
+                "--no-debugger",
+                "--no-reload",
+                "--host 0.0.0.0"
+            ],
+        },
+        {
+            "name": "Calibration",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/Pi/interactive_calibration.py",
+            "cwd": "${fileDirname}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "python": "${workspaceFolder}/Pi/venv/bin/python3.11"
         }
-    ]
+    ],
+    "compounds": [
+        {
+          "name": "Server/Calibration",
+          "configurations": ["Server", "Calibration"],
+          "stopAll": true
+        }
+      ]
 }
